@@ -8,10 +8,11 @@ datasource db {
 }
 
 model user_info {
-  id          Int      @id @default(autoincrement())
+  id          Int      @id @unique(map: "id_UNIQUE")
   email       String   @unique(map: "email_UNIQUE") @db.VarChar(45)
   password    String   @db.VarChar(45)
   name        String?  @db.VarChar(45)
   login_time  DateTime @db.DateTime(0)
   last_logged DateTime @db.DateTime(0)
+  role        String   @db.VarChar(45)
 }
