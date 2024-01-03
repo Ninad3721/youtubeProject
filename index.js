@@ -1,24 +1,31 @@
 import express from "express";
 import "dotenv/config";
-import mysql from "mysql2";
+import { PrismaClient } from "@prisma/client";
+import youtubeApi from "./youtubeApi.js";
+// import youtubeApi from "./youtubeApi.js";
+
 const app = express();
 const port = process.env.portnumber;
+const prisma = new PrismaClient();
 
-//creating connection pool
-const connection = mysql.createConnection({
-  host: process.env.dbHostName,
-  user: process.env.dbUsername,
-  password: process.env.dbPassword,
-  database: process.env.dbDatabaseName,
-});
+app.use("/api", youtubeApi);
 
-connection.connect((err) => {
-  if (err) throw err;
-  console.log("Connected to database");
-});
-
-app.get("/", (req, res) => {
-  //   res.send("request recieved");
+//route after logging in the user first time to collect the info
+app.get("/user_info", async (req, res) => {
+  const user = await prisma.user_info.findUnique({
+    where: {
+      email: req.body.email,
+    },
+  });
+  if (user) {
+    res.send("Email Id already exsist");
+  } else {
+    await prisma.user_info.create({
+      email: req.body.email,
+      name: req.body.name,
+      role: req.body.role,
+    });
+  }
 });
 
 app.listen(port, () => {
