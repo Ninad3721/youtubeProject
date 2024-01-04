@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.portnumber;
 const prisma = new PrismaClient();
 
-app.use("/api", youtubeApi);
+app.use("/", youtubeApi);
 
 //route after logging in the user first time to collect the info
 app.get("/user_info", async (req, res) => {
