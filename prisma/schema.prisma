@@ -15,3 +15,12 @@ model user_info {
   last_logged DateTime @db.DateTime(0)
   role        String   @db.VarChar(45)
 }
+
+model Video {
+  id          Int      @id @unique
+  title       String
+  description String
+  filePath    String // Store the path to the video file
+  uploadedBy  String
+  uploadedAt  DateTime @default(now())
+}
