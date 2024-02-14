@@ -3,16 +3,32 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import youtubeApi from "./youtubeApi.js";
 import upload from "./upload.js";
+import session from "./session.js";
 import bodyParser from "body-parser";
 import supabase from "./supabaseClient.js";
+import cors from "cors";
 // import youtubeApi from "./youtubeApi.js";
 
 const app = express();
 const port = process.env.portnumber;
-const prisma = new PrismaClient();
+
+// app.use(
+//   cors({
+//     origin: [process.env.client_address, process.env.google_auth_url],
+//   })
+// );
+app.use(cors());
+
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//   // Other CORS headers and settings as needed
+//   next();
+// });
 
 app.use("/", youtubeApi);
 app.use("/", upload);
+app.use("/", session);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/signup", async (req, res) => {
@@ -24,13 +40,14 @@ app.post("/signup", async (req, res) => {
     });
     if (error) {
       res.send(error.message);
+      console.log(error);
     } else {
       console.log(data);
-      res.send("You logged in successfully");
+      res.send("You signed up successfully");
       res.status(200);
     }
   } catch (error) {
-    res.send(error);
+    console.log(error.message);
   }
 });
 
@@ -73,20 +90,24 @@ app.get("/signinWithGoogle", async (req, res) => {
   }
 });
 //route after logging in the user first time to collect the info
-app.get("/user_info", async (req, res) => {
-  const user = await prisma.user_info.findUnique({
-    where: {
-      email: req.body.email,
-    },
-  });
-  if (user) {
-    res.send("Email Id already exsist");
-  } else {
-    await prisma.user_info.create({
-      email: req.body.email,
-      name: req.body.name,
-      role: req.body.role,
+app.post("/user_info", async (req, res) => {
+  try {
+    const user = await supabase.auth.getUser();
+    console.log(user.email);
+    const userId = user.data.id;
+    const { error } = await supabase.from("user_profile").insert({
+      id: userId,
+      // username: req.body.username,
+      // email: req.body.email,
+      // isOwner: req.body.isOwner,
     });
+    if (error) {
+      res.send(error.message);
+    } else {
+      res.send("Details registered succesfully");
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
 

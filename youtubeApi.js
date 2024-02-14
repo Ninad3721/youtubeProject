@@ -43,6 +43,8 @@ router.get("/auth?", async (req, res) => {
       token = await oauth2Client.getToken(req.query.code);
       oauth2Client.setCredentials(token);
       console.log(token.res.data.access_token);
+      await sessionStorage.setItem("access_token", token);
+      res.send("Token generated successfully");
     }
   } catch (err) {
     console.log(err);
