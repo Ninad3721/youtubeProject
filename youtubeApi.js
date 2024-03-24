@@ -3,8 +3,10 @@ import { google } from "googleapis";
 import "dotenv/config";
 import axios from "axios";
 import supabase from "./supabaseClient.js";
+import bodyParser from "body-parser";
 
 const router = express.Router();
+router.use(bodyParser.urlencoded({ extended: true }));
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.client_id,
@@ -43,7 +45,7 @@ router.get("/auth?", async (req, res) => {
       token = await oauth2Client.getToken(req.query.code);
       oauth2Client.setCredentials(token);
       console.log(token.res.data.access_token);
-      await sessionStorage.setItem("access_token", token);
+      // await sessionStorage.setItem("access_token", token);
       res.send("Token generated successfully");
     }
   } catch (err) {
@@ -76,12 +78,13 @@ router.get("/userChannelInfo", async (req, res) => {
 //using axios
 router.get("/getChannelData", async (req, res) => {
   try {
-    console.log(process.env.temp_access_token);
+    const token = req.body.access_token;
+    console.log(process.env.google_api_key);
     const response = await axios.get(
       `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&mine=true&key=${process.env.google_api_key}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.temp_access_token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );

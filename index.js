@@ -7,6 +7,9 @@ import session from "./session.js";
 import bodyParser from "body-parser";
 import supabase from "./supabaseClient.js";
 import cors from "cors";
+import assignVideo from "./assignVideo.js";
+import listVideo from "./listVideo.js";
+import downloadVideo from "./downloadVideo.js";
 // import youtubeApi from "./youtubeApi.js";
 
 const app = express();
@@ -28,7 +31,9 @@ app.use(cors());
 app.use("/", youtubeApi);
 app.use("/", upload);
 app.use("/", session);
-
+app.use("/", assignVideo);
+app.use("/", listVideo);
+app.use("/", downloadVideo);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/signup", async (req, res) => {
@@ -60,7 +65,7 @@ app.post("/signinWithPassword", async function (req, res) {
     if (error) {
       res.send(error.message);
     } else {
-      console.log(data);
+      // console.log(data);
       res.send("You signed in successfully");
     }
   } catch (error) {
