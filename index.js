@@ -10,6 +10,7 @@ import cors from "cors";
 import assignVideo from "./assignVideo.js";
 import listVideo from "./listVideo.js";
 import downloadVideo from "./downloadVideo.js";
+import uploadToYoutube from "./uploadToYoutube.js"
 // import youtubeApi from "./youtubeApi.js";
 
 const app = express();
@@ -34,6 +35,7 @@ app.use("/", session);
 app.use("/", assignVideo);
 app.use("/", listVideo);
 app.use("/", downloadVideo);
+app.use("/", uploadToYoutube);
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/signup", async (req, res) => {

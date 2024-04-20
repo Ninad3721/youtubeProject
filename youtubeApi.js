@@ -4,15 +4,32 @@ import "dotenv/config";
 import axios from "axios";
 import supabase from "./supabaseClient.js";
 import bodyParser from "body-parser";
+import S3 from "aws-sdk/clients/s3.js";
+import multer from "multer";
+import fs from "fs";
 
 const router = express.Router();
 router.use(bodyParser.urlencoded({ extended: true }));
 
-const oauth2Client = new google.auth.OAuth2(
+export const oauth2Client = new google.auth.OAuth2(
   process.env.client_id,
   process.env.client_secret,
   process.env.redirect_uri
 );
+
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (req, file, cb) => {
+    cb(null, `${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
+const s3 = new S3({
+  endpoint: process.env.s3_endpoint,
+  accessKeyId: `${process.env.s3_access_key_id}`,
+  secretAccessKey: `${process.env.s3_access_key_secret}`,
+  signatureVersion: "v4",
+});
 
 let token;
 router.get("/videos", (req, res) => {
@@ -43,7 +60,9 @@ router.get("/auth?", async (req, res) => {
       res.status(401);
     } else {
       token = await oauth2Client.getToken(req.query.code);
-      oauth2Client.setCredentials(token);
+      oauth2Client.setCredentials({
+        access_token: token,
+      });
       console.log(token.res.data.access_token);
       // await sessionStorage.setItem("access_token", token);
       res.send("Token generated successfully");
@@ -78,13 +97,16 @@ router.get("/userChannelInfo", async (req, res) => {
 //using axios
 router.get("/getChannelData", async (req, res) => {
   try {
-    const token = req.body.access_token;
-    console.log(process.env.google_api_key);
+    // console.log(oauth2Client);
+    // const token = req.body.access_token;
+    const accessToken =
+      oauth2Client.credentials.access_token.tokens.access_token;
+    console.log(oauth2Client.credentials);
     const response = await axios.get(
       `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&mine=true&key=${process.env.google_api_key}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -103,23 +125,78 @@ router.get("/getChannelData", async (req, res) => {
     res.send(responseArray);
   } catch (error) {
     res.send(error);
-    console.log(error);
+    console.log(error.message);
   }
 });
 
-router.post("/uplaoadVideoOnYoutube", async (req, res) => {
+router.post("/uploadToYoutube", upload.single("file"), async (req, res) => {
   try {
-    const { data, error } = await supabase.storage
-      .from("youtube_layer_video")
-      .getPublicUrl("12345hfdh_big_buck_bunny_720p_1mb.mp4");
-
-    if (error) {
-      console.error("Error generating temporary URL:", error);
+    const newAcc = await oauth2Client.refreshAccessToken();
+    console.log(newAcc);
+    // res.send(oauth.credentials);
+    const video_id = req.body.video_id;
+    const user = await supabase.auth.getUser();
+    const id = user.data.user.id;
+    const user_info = await supabase
+      .from("user_profile")
+      .select("*")
+      .eq("id", id);
+    const video_info = await supabase
+      .from("video_log")
+      .select("*")
+      .eq("id", video_id);
+    // console.log(user_info);
+    // console.log(video_info);
+    if (
+      user_info.data[0].isOwner === false &&
+      video_info.data[0].owner_id !== id
+    ) {
+      res.send("You are not authorized to upload videos");
+      return;
+    } else if (video_info.data[0].status !== "EDITED") {
+      res.send("Video is not edited yet");
+      return;
+    } else {
+      const s3data = {
+        Bucket: process.env.s3_bucket_name,
+        // Key: `${video_info.data[0].owner_id}/${video_info.data[0].video_name}`,
+        Key: "8eb2be3a-a089-4047-8586-22b85777d079/big_buck_bunny_720p_1mb.mp4",
+      };
+      const fileStream = s3.getObject(s3data).createReadStream();
+      const youtube = google.youtube({
+        version: "v3",
+        auth: oauth2Client,
+      });
+      // console.log(oauth2Client);
+      // console.log(req.file.path);
+      const request = youtube.videos.insert(
+        {
+          resource: {
+            snippet: {
+              title: req.body.title,
+              description: req.body.description,
+            },
+            status: {
+              privacyStatus: "private",
+            },
+          },
+          part: "snippet, status",
+          media: {
+            mediaType: "mp4",
+            body: fs.createReadStream(req.file.path),
+          },
+        },
+        (err, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data.data);
+          }
+        }
+      );
     }
-
-    console.log(data);
   } catch (error) {
-    console.log(error);
+    res.send(error.message);
   }
 });
 
