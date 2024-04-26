@@ -20,7 +20,11 @@ const port = process.env.portnumber;
 //     origin: [process.env.client_address, process.env.google_auth_url],
 //   })
 // );
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+  })
+);
 
 // app.use((req, res, next) => {
 //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
