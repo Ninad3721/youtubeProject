@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-// import { configDotenv } from "dotenv";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -13,6 +13,7 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     console.log(typeof process.env.REACT_APP_BACKEND_URL);
@@ -22,6 +23,7 @@ const Login = () => {
     console.log(email);
     console.log(password);
     console.log(process.env.REACT_APP_BACKEND_URL);
+
     try {
       const response = await axios.post(
         `http://localhost:3001/signinWithPassword`,
@@ -35,15 +37,21 @@ const Login = () => {
           },
         }
       );
-      const data = await response.data; // Read the response body
+
+      const data = await response.data;
       console.log("Success:", data);
+
+      // Check if the status code is 200
+      if (response.status === 200) {
+        // Redirect to another route
+        navigate("/ownDash");
+      }
     } catch (error) {
       console.error("Error logging in:", error.message);
     }
   };
 
   return (
-    // console.log(process.env.REACT_APP_BACKEND_URL),
     <Container component="main" maxWidth="xs" sx={{ height: "100vh" }}>
       <Grid
         container

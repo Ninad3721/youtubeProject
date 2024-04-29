@@ -8,12 +8,14 @@ import {
   Box,
 } from "@material-ui/core";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function UserSelector() {
   const [selectedUser, setSelectedUser] = useState("");
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const navigate = useNavigate();
 
   const fetchSessionInfo = async () => {
     try {
@@ -43,17 +45,36 @@ function UserSelector() {
     console.log(id);
     console.log(email);
     console.log(role);
-    const response = await axios.post(
-      "http://localhost:3001/user_info",
-      {
-        id: id,
-        email: email,
-        role: role,
-        username: "test",
-      },
-      { header: { "Content-Type": "application/x-www-form-urlencoded" } }
-    );
-    console.log(response);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user_info",
+        {
+          id: id,
+          email: email,
+          role: role,
+          username: "test",
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      console.log(response);
+
+      // Check if the status code is 200
+      if (response.status === 200) {
+        // Redirect based on the role
+        if (role === "owner") {
+          navigate("/ownDash");
+        } else if (role === "editor") {
+          navigate("/ediDash");
+        }
+      }
+    } catch (error) {
+      console.error("Error posting user info:", error);
+    }
   };
 
   return (

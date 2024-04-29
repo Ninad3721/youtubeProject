@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Container,
   Typography,
@@ -10,6 +12,8 @@ import {
 import axios from "axios";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -30,11 +34,12 @@ const SignUp = () => {
         }
       );
 
-      if (response.status === 200) {
-        alert("Sign up successful!");
-      } else {
-        alert("Failed to sign up.");
-      }
+      // if (response.status === 200) {
+      alert("Sign up successful!");
+      navigate("/select");
+      // } else {
+      //   alert("Failed to sign up.");
+      // }
     } catch (error) {
       console.error("Error signing up:", error.message);
       alert("An error occurred while signing up.");
