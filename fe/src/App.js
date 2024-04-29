@@ -9,6 +9,7 @@ import PastVid from "./comp/PastVid.js";
 import Upload from "./comp/Upload.js";
 import SignUp from "./comp/SignUp.js";
 import UserSelector from "./comp/UserSelector.js";
+import EdiDash from "./comp/EdiDash.js";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/owndash" element={<OwnDash />} />
+        <Route path="/edidash" element={<EdiDash />} />
         <Route path="/past-videos" element={<PastVid />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/signup" element={<SignUp />} />

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, ButtonGroup, Grid } from "@material-ui/core";
+import {
+  Button,
+  ButtonGroup,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+} from "@material-ui/core";
 import axios from "axios";
 
 function UserSelector() {
@@ -26,10 +33,12 @@ function UserSelector() {
   useEffect(() => {
     fetchSessionInfo();
   }, []);
+
   const handleUserSelection = (user) => {
     setSelectedUser(user);
     setRole(user);
   };
+
   const handleButtonClick = async () => {
     console.log(id);
     console.log(email);
@@ -48,30 +57,53 @@ function UserSelector() {
   };
 
   return (
-    <div>
-      <ButtonGroup>
-        <Button
-          variant={selectedUser === "owner" ? "contained" : "outlined"}
-          color="primary"
-          onClick={() => handleUserSelection("owner")}
+    <Card>
+      <CardContent>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
         >
-          Owner
-        </Button>
-        <Button
-          variant={selectedUser === "editor" ? "contained" : "outlined"}
-          color="primary"
-          onClick={() => handleUserSelection("editor")}
-        >
-          Editor
-        </Button>
-      </ButtonGroup>
-      <p>Selected User: {selectedUser}</p>
-      <Grid container justifyContent="flex-end">
-        <Button variant="contained" color="primary" onClick={handleButtonClick}>
-          Next
-        </Button>
-      </Grid>
-    </div>
+          <Card>
+            <CardContent>
+              <Box display="flex" justifyContent="center">
+                <ButtonGroup>
+                  <Button
+                    variant={
+                      selectedUser === "owner" ? "contained" : "outlined"
+                    }
+                    color="primary"
+                    onClick={() => handleUserSelection("owner")}
+                  >
+                    Owner
+                  </Button>
+                  <Button
+                    variant={
+                      selectedUser === "editor" ? "contained" : "outlined"
+                    }
+                    color="primary"
+                    onClick={() => handleUserSelection("editor")}
+                  >
+                    Editor
+                  </Button>
+                </ButtonGroup>
+              </Box>
+              <p>Selected User: {selectedUser}</p>
+              <Grid container justifyContent="center">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleButtonClick}
+                >
+                  Next
+                </Button>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 
