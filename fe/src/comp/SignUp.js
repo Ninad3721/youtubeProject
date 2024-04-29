@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
-// import { configDotenv } from "dotenv";
 import {
   Container,
   Typography,
@@ -9,22 +7,18 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
+import axios from "axios";
 
-const Login = () => {
+const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e) => {
-    console.log(typeof process.env.REACT_APP_BACKEND_URL);
-    console.log(typeof email);
-    console.log(typeof password);
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log(email);
-    console.log(password);
-    console.log(process.env.REACT_APP_BACKEND_URL);
+
     try {
       const response = await axios.post(
-        `http://localhost:3001/signinWithPassword`,
+        "http://localhost:3001/signup",
         {
           email: email,
           password: password,
@@ -35,15 +29,19 @@ const Login = () => {
           },
         }
       );
-      const data = await response.data; // Read the response body
-      console.log("Success:", data);
+
+      if (response.status === 200) {
+        alert("Sign up successful!");
+      } else {
+        alert("Failed to sign up.");
+      }
     } catch (error) {
-      console.error("Error logging in:", error.message);
+      console.error("Error signing up:", error.message);
+      alert("An error occurred while signing up.");
     }
   };
 
   return (
-    // console.log(process.env.REACT_APP_BACKEND_URL),
     <Container component="main" maxWidth="xs" sx={{ height: "100vh" }}>
       <Grid
         container
@@ -54,9 +52,9 @@ const Login = () => {
         <Grid item>
           <Paper elevation={3} sx={{ padding: 4 }}>
             <Typography variant="h5" component="h1" align="center" gutterBottom>
-              Login
+              Sign Up
             </Typography>
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleSignUp}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -86,7 +84,7 @@ const Login = () => {
                 color="primary"
                 sx={{ mt: 2 }}
               >
-                Login
+                Sign Up
               </Button>
             </form>
           </Paper>
@@ -96,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

@@ -7,6 +7,8 @@ import Login from "./comp/Login.js";
 import OwnDash from "./comp/OwnDash.js";
 import PastVid from "./comp/PastVid.js";
 import Upload from "./comp/Upload.js";
+import SignUp from "./comp/SignUp.js";
+import UserSelector from "./comp/UserSelector.js";
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/owndash" element={<OwnDash />} />
         <Route path="/past-videos" element={<PastVid />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/select" element={<UserSelector />} />
       </Routes>
     </Router>
   );
