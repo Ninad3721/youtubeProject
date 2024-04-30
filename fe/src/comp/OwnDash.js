@@ -7,17 +7,32 @@ import {
   Box,
   Card,
   CardContent,
+  TableContainer,
+  Paper,
+  TableHead,
+  TableCell,
+  Table,
+  TableBody,
+  TableRow,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 
 const OwnDash = () => {
+  const [tableData, setTableData] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/getChannelData"
+          "http://localhost:5000/getChannelData"
         );
+
+        const tableResponse = await axios.get(
+          "http://localhost:5000/listOwnerVideo"
+        );
+        console.log(tableResponse.data);
+        setTableData(tableResponse.data);
+
         // setChannelData(response.data);
       } catch (error) {
         console.error("Error fetching channel data:", error);
@@ -110,6 +125,47 @@ const OwnDash = () => {
           )}
         </CardContent>
       </Card>
+      <div>
+        <TableContainer component={Paper} sx={{ marginTop: 5 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Serial No</TableCell>
+                <TableCell>Video ID</TableCell>
+                <TableCell>Video Name</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Assign</TableCell>
+                <TableCell>Editor Email</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tableData.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row.video_name}</TableCell>
+                  <TableCell>{row.status}</TableCell>
+                  <TableCell>
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                      onCLick={() => {
+                        Navigate("/assign-video");
+                      }}
+                    >
+                      Assign
+                    </Button>
+                  </TableCell>
+                  <TableCell>{row.editor_email}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   );
 };

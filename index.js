@@ -20,11 +20,15 @@ const port = process.env.portnumber;
 //     origin: [process.env.client_address, process.env.google_auth_url],
 //   })
 // );
-app.use(
-  cors({
-    origin: true,
-  })
-);
+app.use(cors());
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // Update with your frontend URL
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // app.use((req, res, next) => {
 //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -102,10 +106,14 @@ app.get("/signinWithGoogle", async (req, res) => {
 app.post("/user_info", async (req, res) => {
   try {
     const user = await supabase.auth.getUser();
-    console.log(user.email);
-    const userId = user.data.id;
+    console.log(user.data.user.id);
+    const userId = user.data.user.id;
     const { error } = await supabase.from("user_profile").insert({
       id: userId,
+      email: user.data.user.email,
+      // email: req.body.email,
+      username: req.body.username,
+      isOwner: req.body.isOwner,
       // username: req.body.username,
       // email: req.body.email,
       // isOwner: req.body.isOwner,

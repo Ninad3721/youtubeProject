@@ -22,7 +22,7 @@ const SignUp = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/signup",
+        "http://localhost:5000/signup",
         {
           email: email,
           password: password,

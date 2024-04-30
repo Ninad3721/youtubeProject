@@ -26,7 +26,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/signinWithPassword`,
+        `http://localhost:5000/signinWithPassword`,
         {
           email: email,
           password: password,
@@ -97,6 +97,16 @@ const Login = () => {
                 Login
               </Button>
             </form>
+
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              sx={{ mt: 2 }}
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
+            </Button>
           </Paper>
         </Grid>
       </Grid>

@@ -46,6 +46,7 @@ router.get("/auth?", async (req, res) => {
       oauth2Client.setCredentials(token);
       console.log(token.res.data.access_token);
       // await sessionStorage.setItem("access_token", token);
+      res.header("Access-Control-Allow-Origin", "http://localhost:3000/videos");
       res.send("Token generated successfully");
     }
   } catch (err) {

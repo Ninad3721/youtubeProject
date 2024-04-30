@@ -10,6 +10,7 @@ import Upload from "./comp/Upload.js";
 import SignUp from "./comp/SignUp.js";
 import UserSelector from "./comp/UserSelector.js";
 import EdiDash from "./comp/EdiDash.js";
+import Assign from "./comp/Assign.js"
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/upload" element={<Upload />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/select" element={<UserSelector />} />
+        <Route path="/assignVideo" element={<Assign />} />
       </Routes>
     </Router>
   );

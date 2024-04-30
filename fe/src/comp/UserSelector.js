@@ -6,6 +6,10 @@ import {
   Card,
   CardContent,
   Box,
+  Paper,
+  Container,
+  Typography,
+  TextField,
 } from "@material-ui/core";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -14,19 +18,18 @@ function UserSelector() {
   const [selectedUser, setSelectedUser] = useState("");
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState(true);
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
   const fetchSessionInfo = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/sessionInfo");
+      const response = await axios.get("http://localhost:5000/sessionInfo");
       const userData = response.data.data.session.user;
       setId(response.data.data.session.user.id);
       setEmail(response.data.data.session.user.email);
-      setRole(response.data.data.session.user.role);
       console.log("id " + response.data.data.session.user.id);
       console.log("email " + response.data.data.session.user.email);
-      console.log("role " + response.data.data.session.user.role);
     } catch (error) {
       console.error("Error fetching session info:", error);
     }
@@ -38,7 +41,11 @@ function UserSelector() {
 
   const handleUserSelection = (user) => {
     setSelectedUser(user);
-    setRole(user);
+    if (user === "owner") {
+      setRole(true);
+    } else {
+      setRole(false);
+    }
   };
 
   const handleButtonClick = async () => {
@@ -48,12 +55,12 @@ function UserSelector() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/user_info",
+        "http://localhost:5000/user_info",
         {
           id: id,
           email: email,
-          role: role,
-          username: "test",
+          isOwner: role,
+          username: username,
         },
         {
           headers: {
@@ -66,10 +73,14 @@ function UserSelector() {
       // Check if the status code is 200
       if (response.status === 200) {
         // Redirect based on the role
-        if (role === "owner") {
-          navigate("/ownDash");
-        } else if (role === "editor") {
-          navigate("/ediDash");
+        if (role === true) {
+          axios.get("http://localhost:5000/videos", {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } else if (role === false) {
+          navigate("/edidash");
         }
       }
     } catch (error) {
@@ -78,53 +89,83 @@ function UserSelector() {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="center">
-                <ButtonGroup>
-                  <Button
-                    variant={
-                      selectedUser === "owner" ? "contained" : "outlined"
-                    }
-                    color="primary"
-                    onClick={() => handleUserSelection("owner")}
-                  >
-                    Owner
-                  </Button>
-                  <Button
-                    variant={
-                      selectedUser === "editor" ? "contained" : "outlined"
-                    }
-                    color="primary"
-                    onClick={() => handleUserSelection("editor")}
-                  >
-                    Editor
-                  </Button>
-                </ButtonGroup>
-              </Box>
-              <p>Selected User: {selectedUser}</p>
-              <Grid container justifyContent="center">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleButtonClick}
+    <Container component="main" maxWidth="xl" sx={{ height: "100px" }}>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        sx={{ height: "100%" }}
+      >
+        <Grid item>
+          <Paper elevation={3} sx={{ padding: 10 }}>
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
+              Role Selection
+            </Typography>
+            <Card>
+              <CardContent>
+                <p>Select your role </p>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  width={"200px"}
                 >
-                  Next
-                </Button>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Box>
-      </CardContent>
-    </Card>
+                  <ButtonGroup>
+                    <Button
+                      variant={
+                        selectedUser === "owner" ? "contained" : "outlined"
+                      }
+                      color="primary"
+                      onClick={() => handleUserSelection("owner")}
+                    >
+                      Owner
+                    </Button>
+                    <Button
+                      variant={
+                        selectedUser === "editor" ? "contained" : "outlined"
+                      }
+                      color="primary"
+                      onClick={() => handleUserSelection("editor")}
+                    >
+                      Editor
+                    </Button>
+                  </ButtonGroup>
+                </Box>
+                {selectedUser === "editor" ? (
+                  <p>
+                    Editor is one who get to edits the videos uploded by the
+                    owner
+                  </p>
+                ) : (
+                  <p>
+                    Owner is one who will be assigning th e video to the editor
+                    and should have an youtube account
+                  </p>
+                )}
+                <p>Enter your username</p>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="Username"
+                  type="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <Grid container justifyContent="center">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleButtonClick}
+                  >
+                    Next
+                  </Button>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
 

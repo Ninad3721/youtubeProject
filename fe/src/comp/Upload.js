@@ -11,7 +11,6 @@ import {
 
 const Upload = () => {
   const inputRef = useRef(null);
-  const [ownerEmail, setOwnerEmail] = useState("");
   const [editorEmail, setEditorEmail] = useState("");
 
   const handleUpload = async () => {
@@ -29,13 +28,14 @@ const Upload = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("owner_email", ownerEmail);
       formData.append("editor_email", editorEmail);
 
       const response = await axios.post(
-        "http://localhost:3001/uploadVideo",
+        "http://localhost:5000/uploadVideo",
         formData
       );
+
+      console.log(response);
       if (response.status === 200) {
         alert("Video uploaded successfully!");
       } else {
@@ -62,13 +62,6 @@ const Upload = () => {
             </Typography>
             <div>
               <input ref={inputRef} type="file" accept="video/*" />
-              <TextField
-                label="Owner Email"
-                fullWidth
-                value={ownerEmail}
-                onChange={(e) => setOwnerEmail(e.target.value)}
-                sx={{ marginY: 1 }}
-              />
               <TextField
                 label="Editor Email"
                 fullWidth

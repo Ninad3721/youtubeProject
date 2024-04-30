@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Grid,
   AppBar,
   Toolbar,
   Typography,
@@ -7,7 +8,13 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
+  TableContainer,
+  Paper,
+  TableHead,
+  TableCell,
+  Table,
+  TableBody,
+  TableRow,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -77,41 +84,45 @@ const EdiDash = () => {
           </Button>
         </Toolbar>
       </AppBar>
-      <Grid container spacing={3} sx={{ marginTop: 2 }}>
-        {videos.map((video) => (
-          <Grid item xs={12} sm={6} md={4} key={video.id}>
-            <Card
-              sx={{
-                maxWidth: 400,
-                margin: "auto",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                borderRadius: 4,
-                backgroundColor: "#f5f5f5",
-              }}
-            >
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  component="h2"
-                  gutterBottom
-                  sx={{ color: "#333" }}
-                >
-                  {video.videoName}
-                </Typography>
-                <Typography variant="body1" gutterBottom sx={{ color: "#666" }}>
-                  Editor: {video.editorName}
-                </Typography>
-                <Typography variant="body1" gutterBottom sx={{ color: "#666" }}>
-                  Status: {video.status}
-                </Typography>
-                <Typography variant="body1" gutterBottom sx={{ color: "#666" }}>
-                  Created At: {video.createdAt}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <TableContainer component={Paper} sx={{ marginTop: 5 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Serial No</TableCell>
+              <TableCell>Video ID</TableCell>
+              <TableCell>Video Name</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Assign</TableCell>
+              <TableCell>Editor Email</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {/* {tableData.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.video_name}</TableCell>
+                <TableCell>{row.status}</TableCell>
+                <TableCell>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}
+                    onCLick={() => {
+                      Navigate("/assign-video");
+                    }}
+                  >
+                    Assign
+                  </Button>
+                </TableCell>
+                <TableCell>{row.editor_email}</TableCell>
+              </TableRow>
+            ))} */}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };
